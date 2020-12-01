@@ -1,8 +1,6 @@
 package com.example.route
 
-import com.example.data.checkIfUserExists
-import com.example.data.collections.User
-import com.example.data.registerUser
+import com.example.data.checkIfUserPasswordIsCorrect
 import com.example.data.requests.AccountRequest
 import com.example.data.responses.SimpleResponse
 import io.ktor.application.call
@@ -16,10 +14,10 @@ import io.ktor.routing.route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-fun Route.registerRoute(){
-    route("/register"){
+fun Route.loginRoute(){
+    route("/login"){
         post {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO){
                 val request = try {
                     call.receive<AccountRequest>()
                 }
@@ -27,17 +25,14 @@ fun Route.registerRoute(){
                     call.respond(HttpStatusCode.BadRequest)
                     return@withContext
                 }
-                val userExists = checkIfUserExists(request.email)
-                if (!userExists) {
-                    if (registerUser(User(request.email, request.password))) {
-                        call.respond(HttpStatusCode.OK, SimpleResponse(true, "Successfully created account"))
-                    }
-                    else {
-                        call.respond(HttpStatusCode.OK, SimpleResponse(false, "An unknown error occurred"))
-                    }
+                val isPasswordCorrect = checkIfUserPasswordIsCorrect(request.email, request.password)
+                if(isPasswordCorrect){
+                    call.respond(HttpStatusCode.OK, SimpleResponse(true, "You have successfully logged in"))
+                }
+                else{
+                    call.respond(HttpStatusCode.OK, SimpleResponse(false, "Email or password is incorrect"))
                 }
             }
         }
-
     }
 }
