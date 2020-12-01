@@ -6,6 +6,7 @@ import org.litote.kmongo.contains
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
+import org.litote.kmongo.set
 import org.litote.kmongo.setValue
 
 private val client = KMongo.createClient().coroutine
@@ -38,6 +39,16 @@ suspend fun saveNote(note: Note): Boolean {
     else {
         notes.insertOne(note).wasAcknowledged()
     }
+}
+
+suspend fun isOwnerOfNote(id: String, owner: String): Boolean {
+    val note = notes.findOneById(id) ?: return false
+    return owner in note.owners
+}
+
+suspend fun addOwnerToNote(id: String, owner: String): Boolean {
+    val owners = notes.findOneById(id)?.owners ?: return false
+    return notes.updateOneById(id, setValue(Note::owners, owners + owner)).wasAcknowledged()
 }
 
 suspend fun deleteNoteForUser(email: String, id: String): Boolean {
