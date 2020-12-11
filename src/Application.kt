@@ -20,6 +20,11 @@ fun Application.module(testing: Boolean = false) {
 
     install(DefaultHeaders)
     install(CallLogging)
+    install(ContentNegotiation) {
+        gson {
+            setPrettyPrinting()
+        }
+    }
     install(Authentication){
         configAuth()
     }
@@ -28,11 +33,7 @@ fun Application.module(testing: Boolean = false) {
         loginRoute()
         noteRoutes()
     }
-    install(ContentNegotiation) {
-        gson {
-            setPrettyPrinting()
-        }
-    }
+
 
 }
 

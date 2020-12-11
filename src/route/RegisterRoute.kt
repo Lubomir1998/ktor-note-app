@@ -5,6 +5,7 @@ import com.example.data.collections.User
 import com.example.data.registerUser
 import com.example.data.requests.AccountRequest
 import com.example.data.responses.SimpleResponse
+import com.example.secure.getHashWithSalt
 import io.ktor.application.call
 import io.ktor.features.ContentTransformationException
 import io.ktor.http.HttpStatusCode
@@ -29,7 +30,7 @@ fun Route.registerRoute(){
                 }
                 val userExists = checkIfUserExists(request.email)
                 if (!userExists) {
-                    if (registerUser(User(request.email, request.password))) {
+                    if (registerUser(User(request.email, getHashWithSalt(request.password)))) {
                         call.respond(HttpStatusCode.OK, SimpleResponse(true, "Successfully created account"))
                     }
                     else {

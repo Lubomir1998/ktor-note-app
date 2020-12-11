@@ -2,11 +2,11 @@ package com.example.data
 
 import com.example.data.collections.Note
 import com.example.data.collections.User
+import com.example.secure.checkHashForPassword
 import org.litote.kmongo.contains
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
-import org.litote.kmongo.set
 import org.litote.kmongo.setValue
 
 private val client = KMongo.createClient().coroutine
@@ -24,7 +24,7 @@ suspend fun checkIfUserExists(email: String): Boolean{
 
 suspend fun checkIfUserPasswordIsCorrect(email: String, password: String): Boolean{
     val actualPassword = users.findOne(User::email eq email)?.password ?: return false
-    return actualPassword == password
+    return checkHashForPassword(password, actualPassword)
 }
 
 suspend fun getNotesForUser(email: String): List<Note> {
